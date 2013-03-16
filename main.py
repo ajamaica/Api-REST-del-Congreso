@@ -53,6 +53,15 @@ class Diputado(db.Model):
         return self.nombre
     
 
+class DiputadoComision(db.Model):
+    diputado = db.ReferenceProperty(Diputado,
+                                   required=True,
+                                   collection_name='diputado')
+    comision = db.ReferenceProperty(Comision,
+                                   required=True,
+                                   collection_name='comision')
+    titulo = db.StringProperty()
+    
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.write('Hello world!')
@@ -79,6 +88,8 @@ class DiputadoHandler(webapp2.RequestHandler):
         comisiones = soup.find("table").findAll("a",{"href" : re.compile("integrantes_de_comisionlx")})
         
         
+        
+        
         obj_diputado = Diputado.get_or_insert(str(id))
         entidad = Entidad.get_or_insert(entidad_n)
         entidad.nombre = entidad_n
@@ -93,6 +104,14 @@ class DiputadoHandler(webapp2.RequestHandler):
         obj_diputado.onomastico = onomastico
         obj_diputado.email  = email
         obj_diputado.put()
+        
+        for comision in comisiones:
+            com = Comision.get_or_insert(str(comision['href'].replace("integrantes_de_comisionlxii.php?comt=","")))
+            com.nombre = comision.text
+            com.put()
+            relation = DiputadoComision(comision = com,diputado = obj_diputado)
+            relation.put()
+            
         result = []
         result.append(dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()]))
         self.response.write(simplejson.dumps(  result ))

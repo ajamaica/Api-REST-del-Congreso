@@ -5,7 +5,7 @@
 + Run
 
 GET /diputado/$' : Lista todos los diputados y sus fracciones con su id, puede listar mas datos
-GET /diputado/(\d+)$' : Lista información básica de diputado incluye sus comisiones pero no terminado
+GET /diputado/(\d+)$' : Lista información básica de diputado
 
 # TODO 
 
