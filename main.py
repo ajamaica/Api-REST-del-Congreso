@@ -20,6 +20,12 @@ from BeautifulSoup import *
 from google.appengine.ext import db
 import json as simplejson
 
+def gql_json_parser(query_obj):
+    result = []
+    for entry in query_obj:
+        result.append(dict([(p, (unicode(getattr(entry, p)))) for p in entry.properties()]))
+    return result
+    
 class Fraccion(db.Model):
     nombre = db.StringProperty(required= False)
     def __unicode__(self):
@@ -73,7 +79,7 @@ class IniciativaHandler(webapp2.RequestHandler):
 class DiputadoHandler(webapp2.RequestHandler):
     def get(self,id):
         url = "http://sitl.diputados.gob.mx/LXII_leg/curricula.php?dipt=%s" % id
-        content = urlfetch.fetch(url,deadline=90,headers = { 'Cache-Control': 'no-cache,max-age=0', 'Pragma': 'no-cache' }).content
+        content = urlfetch.fetch(url,deadline=90).content
         soup = BeautifulSoup(content)
         dumped = soup.find("table").findAll("tr")[2].findAll("table")[1]
         
@@ -119,9 +125,16 @@ class DiputadoHandler(webapp2.RequestHandler):
         
 
 class DiputadosHandler(webapp2.RequestHandler):
+    
     def get(self):
+        teams = gql_json_parser(Diputado.all().order("nu_diputado")) 
+        
+        self.response.write(simplejson.dumps( teams ))
+    
+    def crawl(self):
+        
         url = "http://sitl.diputados.gob.mx/LXII_leg/listado_diputados_gpnp.php?tipot="
-        content = urlfetch.fetch(url,deadline=90,headers = { 'Cache-Control': 'no-cache,max-age=0', 'Pragma': 'no-cache' }).content
+        content = urlfetch.fetch(url,deadline=90).content
         soup = BeautifulSoup(content)
         dumped = soup.find("table").findAll("table")[1].findAll("tr")
 
@@ -153,7 +166,60 @@ class DiputadosHandler(webapp2.RequestHandler):
                 if diputado.find("img")['src'] == 'images/panal.gif': 
                     fraccion =  Fraccion.get_or_insert("PANAL", nombre ="PANAL")
                 
-                fraccion.put()
+                #fraccion.put()
+                
+            if diputado.find("a"):
+                
+                id_diputado = diputado.find("a")['href'].replace("curricula.php?dipt=","")
+                obj_diputado = Diputado.get_or_insert(id_diputado)
+                obj_diputado.nombre = diputado.find("a").text[3:].strip()
+                obj_diputado.nu_diputado = int(id_diputado)
+                obj_diputado.fraccion = fraccion
+                obj_diputado.put()
+                
+                diputados.append({ "nu_diputado" :  obj_diputado.nu_diputado, "diputado" :  obj_diputado.nombre   , "partido" : fraccion.nombre })
+                
+        self.response.write(simplejson.dumps( diputados ))
+
+class DiputadosCrawlHandler(webapp2.RequestHandler):
+    
+    
+    def get(self):
+        
+        url = "http://sitl.diputados.gob.mx/LXII_leg/listado_diputados_gpnp.php?tipot="
+        content = urlfetch.fetch(url,deadline=90).content
+        soup = BeautifulSoup(content)
+        dumped = soup.find("table").findAll("table")[1].findAll("tr")
+
+        diputados = list(dict())
+        fraccion =  Fraccion()
+        indexP = 0
+        
+        for diputado in dumped:
+            
+            if diputado.find("img"):
+                if diputado.find("img")['src'] == 'images/pri01.png':
+                    fraccion =  Fraccion.get_or_insert("PRI", nombre ="PRI")
+                
+                if diputado.find("img")['src'] == 'images/pan.png':
+                    fraccion =  Fraccion.get_or_insert("PAN", nombre ="PAN")
+                
+                if diputado.find("img")['src'] == 'images/prd01.png':
+                    fraccion =  Fraccion.get_or_insert("PRD", nombre ="PRD")
+                
+                if diputado.find("img")['src'] == 'images/logvrd.jpg': 
+                    fraccion =  Fraccion.get_or_insert("VERDE", nombre ="Verde")
+                
+                if diputado.find("img")['src'] == 'images/logo_movimiento_ciudadano.png': 
+                    fraccion =  Fraccion.get_or_insert("MOVCI", nombre ="Movimiento Ciudadano")
+
+                if diputado.find("img")['src'] == 'images/logpt.jpg': 
+                    fraccion =  Fraccion.get_or_insert("PT", nombre ="PT")
+                
+                if diputado.find("img")['src'] == 'images/panal.gif': 
+                    fraccion =  Fraccion.get_or_insert("PANAL", nombre ="PANAL")
+                
+                #fraccion.put()
                 
             if diputado.find("a"):
                 
@@ -172,9 +238,9 @@ class DiputadoIniciativaHandler(webapp2.RequestHandler):
     def get(self,id):
         
         
-        for index in range(5):
+        for index in range(6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/iniciativas_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
-            content = urlfetch.fetch(url,deadline=90,headers = { 'Cache-Control': 'no-cache,max-age=0', 'Pragma': 'no-cache' }).content
+            content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[1]
         
@@ -184,9 +250,9 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
     def get(self,id):
         
         
-        for index in range(5):
+        for index in range(6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
-            content = urlfetch.fetch(url,deadline=90,headers = { 'Cache-Control': 'no-cache,max-age=0', 'Pragma': 'no-cache' }).content
+            content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[1]
         
@@ -195,31 +261,45 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
 class DiputadoVotacionesHandler(webapp2.RequestHandler):
     def get(self,id):
         
-        
-        for index in range(5):
+        votaciones = dict()
+        for index in range(6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/votaciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
-            content = urlfetch.fetch(url,deadline=90,headers = { 'Cache-Control': 'no-cache,max-age=0', 'Pragma': 'no-cache' }).content
+            content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
-            dumped = soup.findAll("table")[0]
-        
-            self.response.write( dumped )
+            dumped = soup.findAll("table")[0].findAll("table")[1]
+            tr = dumped.findAll("tr")[3:]
+            
+            
+            fecha = ""
+            
+            if tr:
+                for row in tr :
+                    if (len(row.contents)) == 1 and  row.contents[0] != "\n" :
+                        fecha = row.contents[0]
+                        votaciones[fecha.text] = list()
+                    
+                    if (len(row.contents)) == 9:
+                        data = [item.text for item in row.contents if item != "\n" and item.text != "&nbsp;" ]
+                        votaciones[fecha.text].append({"id_dia":data[0],"titulo":data[1], "sentido":data[2]})
+                        
+        self.response.write(simplejson.dumps( votaciones ))
 
 class DiputadoAsistenciasHandler(webapp2.RequestHandler):
     def get(self,id):
         
         
-        for index in range(5):
+        for index in range(6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/asistencias_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
-            content = urlfetch.fetch(url,deadline=90,headers = { 'Cache-Control': 'no-cache,max-age=0', 'Pragma': 'no-cache' }).content
+            content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[0]
-        
             self.response.write( dumped )
             
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/iniciativa/(\d+)$', IniciativaHandler),
     ('/diputado/$', DiputadosHandler),
+    ('/diputado/crawl$', DiputadosCrawlHandler),
     ('/diputado/(\d+)$', DiputadoHandler),
     ('/diputado/(\d+)/iniciativas$', DiputadoIniciativaHandler),
     ('/diputado/(\d+)/proposiciones$', DiputadoIniciativaHandler),
