@@ -167,10 +167,23 @@ class DiputadosHandler(webapp2.RequestHandler):
                 diputados.append({ "nu_diputado" :  obj_diputado.nu_diputado, "diputado" :  obj_diputado.nombre   , "partido" : fraccion.nombre })
                 
         self.response.write(simplejson.dumps( diputados ))
+        
+class DiputadoIniciativaHandler(webapp2.RequestHandler):
+    def get(self,id):
+        
+        
+        for index in range(5):
+            url = "http://sitl.diputados.gob.mx/LXII_leg/iniciativas_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
+            content = urlfetch.fetch(url,deadline=90,headers = { 'Cache-Control': 'no-cache,max-age=0', 'Pragma': 'no-cache' }).content
+            soup = BeautifulSoup(content)
+            dumped = soup.findAll("table")[1]
+        
+            self.response.write( dumped )
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/iniciativa/(\d+)$', IniciativaHandler),
     ('/diputado/$', DiputadosHandler),
-    ('/diputado/(\d+)$', DiputadoHandler)
+    ('/diputado/(\d+)$', DiputadoHandler),
+    ('/diputado/(\d+)/iniciativa/$', DiputadoIniciativaHandler)
 ], debug=True)
