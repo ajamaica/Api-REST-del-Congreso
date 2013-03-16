@@ -93,9 +93,6 @@ class DiputadoHandler(webapp2.RequestHandler):
         email = dumped.findAll("tr")[8].text.split(":")[1]
         comisiones = soup.find("table").findAll("a",{"href" : re.compile("integrantes_de_comisionlx")})
         
-        
-        
-        
         obj_diputado = Diputado.get_or_insert(str(id))
         entidad = Entidad.get_or_insert(entidad_n)
         entidad.nombre = entidad_n

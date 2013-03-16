@@ -6,6 +6,8 @@
 
 GET /diputado/$' : Lista todos los diputados y sus fracciones con su id, puede listar mas datos
 GET /diputado/(\d+)$' : Lista información básica de diputado
+GET /diputado/(\d+)/votaciones$' : Json de Votaciones ordenados por fechas
+GET /diputado/(\d+)/asistencias$ : JSON de meses con días los diputados trabajan 2 días a la semana
 
 # TODO 
 
@@ -13,6 +15,4 @@ GET /diputado/(\d+)$' : Lista información básica de diputado
 
 - GET /diputado/(\d+)/proposiciones$' : Pasar esto a JSON http://sitl.diputados.gob.mx/LXII_leg/proposiciones_diputados_xperiodonplxii.php?dipt=15
 
-- GET /diputado/(\d+)/votaciones$' : Pasar esto a JSON http://sitl.diputados.gob.mx/LXII_leg/votaciones_diputados_xperiodonplxii.php?dipt=15
 
-- GET /diputado/(\d+)/asistencias$' : Pasar esto a JSON http://sitl.diputados.gob.mx/LXII_leg/asistencias_diputados_xperiodonplxii.php?dipt=15
