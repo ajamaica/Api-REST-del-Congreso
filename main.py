@@ -96,8 +96,8 @@ class DiputadoHandler(webapp2.RequestHandler):
         obj_diputado.put()
         result = []
         result.append(dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()]))
-        #self.response.write(simplejson.dumps(  result ))
-        self.response.write("%s" % comisiones)
+        self.response.write(simplejson.dumps(  result ))
+        #self.response.write("%s" % comisiones)
         
 
 class DiputadosHandler(webapp2.RequestHandler):
