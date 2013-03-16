@@ -121,7 +121,6 @@ class DiputadoHandler(webapp2.RequestHandler):
         result = []
         result.append(dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()]))
         self.response.write(simplejson.dumps(  result ))
-        #self.response.write("%s" % comisiones)
         
 
 class DiputadosHandler(webapp2.RequestHandler):
@@ -238,40 +237,39 @@ class DiputadoIniciativaHandler(webapp2.RequestHandler):
     def get(self,id):
         
         
-        for index in range(6):
+        for index in range(1,6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/iniciativas_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[1]
-        
-            self.response.write( dumped )
+            self.response.write("%s"% dumped )
+            
+            
+            
 
 class DiputadoProposicionesHandler(webapp2.RequestHandler):
     def get(self,id):
         
         
-        for index in range(6):
+        for index in range(1,6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[1]
         
-            self.response.write( dumped )
+            self.response.write( dumped.findAll("tr") )
             
 class DiputadoVotacionesHandler(webapp2.RequestHandler):
     def get(self,id):
         
         votaciones = dict()
-        for index in range(6):
+        for index in range(1,6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/votaciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[0].findAll("table")[1]
             tr = dumped.findAll("tr")[3:]
-            
-            
             fecha = ""
-            
             if tr:
                 for row in tr :
                     if (len(row.contents)) == 1 and  row.contents[0] != "\n" :
@@ -287,13 +285,22 @@ class DiputadoVotacionesHandler(webapp2.RequestHandler):
 class DiputadoAsistenciasHandler(webapp2.RequestHandler):
     def get(self,id):
         
+        asistencias = dict()
         
-        for index in range(6):
+        for index in range(1,6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/asistencias_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[0]
-            self.response.write( dumped )
+            for mes in dumped.findAll("table")[5].findAll("table"):
+                mes_txt = mes.find("span", {"class" : "TitulosVerde"})
+                if mes_txt:
+                    asistencias[mes_txt.text] = list()
+                    for dia in mes.findAll("td",{"bgcolor" : "#D6E2E2"}):
+                        asistencias[mes_txt.text].append({"dia": dia.find("font").contents[0], "estado" : dia.find("font").contents[2]})
+        del asistencias[""]
+        self.response.write(simplejson.dumps(asistencias ))
+                
             
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
