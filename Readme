@@ -1,0 +1,12 @@
+GET /diputado/$' : Lista todos los diputados y sus fracciones con su id, puede listar mas datos
+GET /diputado/(\d+)$' : Lista información básica de diputado incluye sus comisiones pero no terminado
+
+# TODO 
+
+- GET /diputado/(\d+)/iniciativas$' : Pasar esto a JSON http://sitl.diputados.gob.mx/LXII_leg/iniciativas_diputados_xperiodonplxii.php?dipt=15
+
+- GET /diputado/(\d+)/proposiciones$' : Pasar esto a JSON http://sitl.diputados.gob.mx/LXII_leg/proposiciones_diputados_xperiodonplxii.php?dipt=15
+
+- GET /diputado/(\d+)/votaciones$' : Pasar esto a JSON http://sitl.diputados.gob.mx/LXII_leg/votaciones_diputados_xperiodonplxii.php?dipt=15
+
+- GET /diputado/(\d+)/asistencias$' : Pasar esto a JSON http://sitl.diputados.gob.mx/LXII_leg/asistencias_diputados_xperiodonplxii.php?dipt=15
