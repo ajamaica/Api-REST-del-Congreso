@@ -180,10 +180,36 @@ class DiputadoIniciativaHandler(webapp2.RequestHandler):
         
             self.response.write( dumped )
 
+class DiputadoProposicionesHandler(webapp2.RequestHandler):
+    def get(self,id):
+        
+        
+        for index in range(5):
+            url = "http://sitl.diputados.gob.mx/LXII_leg/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
+            content = urlfetch.fetch(url,deadline=90,headers = { 'Cache-Control': 'no-cache,max-age=0', 'Pragma': 'no-cache' }).content
+            soup = BeautifulSoup(content)
+            dumped = soup.findAll("table")[1]
+        
+            self.response.write( dumped )
+            
+class DiputadoVotacionesHandler(webapp2.RequestHandler):
+    def get(self,id):
+        
+        
+        for index in range(5):
+            url = "http://sitl.diputados.gob.mx/LXII_leg/votaciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
+            content = urlfetch.fetch(url,deadline=90,headers = { 'Cache-Control': 'no-cache,max-age=0', 'Pragma': 'no-cache' }).content
+            soup = BeautifulSoup(content)
+            dumped = soup.findAll("table")[0]
+        
+            self.response.write( dumped )
+            
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/iniciativa/(\d+)$', IniciativaHandler),
     ('/diputado/$', DiputadosHandler),
     ('/diputado/(\d+)$', DiputadoHandler),
-    ('/diputado/(\d+)/iniciativa/$', DiputadoIniciativaHandler)
+    ('/diputado/(\d+)/iniciativas/$', DiputadoIniciativaHandler),
+    ('/diputado/(\d+)/proposiciones/$', DiputadoIniciativaHandler),
+    ('/diputado/(\d+)/votaciones/$', DiputadoVotacionesHandler)
 ], debug=True)
