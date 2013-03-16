@@ -221,8 +221,8 @@ app = webapp2.WSGIApplication([
     ('/iniciativa/(\d+)$', IniciativaHandler),
     ('/diputado/$', DiputadosHandler),
     ('/diputado/(\d+)$', DiputadoHandler),
-    ('/diputado/(\d+)/iniciativas/$', DiputadoIniciativaHandler),
-    ('/diputado/(\d+)/proposiciones/$', DiputadoIniciativaHandler),
-    ('/diputado/(\d+)/votaciones/$', DiputadoVotacionesHandler),
-    ('/diputado/(\d+)/asistencias/$', DiputadoAsistenciasHandler),
+    ('/diputado/(\d+)/iniciativas$', DiputadoIniciativaHandler),
+    ('/diputado/(\d+)/proposiciones$', DiputadoIniciativaHandler),
+    ('/diputado/(\d+)/votaciones$', DiputadoVotacionesHandler),
+    ('/diputado/(\d+)/asistencias$', DiputadoAsistenciasHandler),
 ], debug=True)
