@@ -24,7 +24,17 @@ class Comision(db.Model):
     num = db.StringProperty(required= False)
     def __unicode__(self):
         return self.nombre
-        
+
+class Iniciativa(db.Model):
+    nombre = db.StringProperty(required= False)
+    num = db.StringProperty(required= False)
+    turno = db.StringProperty(required= False)
+    comision = db.StringProperty(required= False)
+    resolutivos = db.StringProperty(required= False)
+    
+    def __unicode__(self):
+        return self.nombre      
+          
 class Entidad(db.Model):
     nombre = db.StringProperty(required= False)
     def __unicode__(self):
@@ -252,8 +262,13 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[1]
-        
-            self.response.write( dumped.findAll("tr") )
+            if dumped.findAll("tr")[1] :
+                cells = dumped.findAll("tr")[1].findAll("td")
+                if len(cells) :
+                    self.response.write( "Primero %s" % cells[0].contents[0].text )
+                    self.response.write( "Segundo %s" % cells[1] )
+                    self.response.write( "Tercero %s" % cells[4] )
+                    
             
 class DiputadoVotacionesHandler(webapp2.RequestHandler):
     def get(self,id):
