@@ -229,7 +229,17 @@ class DiputadoIniciativaHandler(webapp2.RequestHandler):
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[1]
-            self.response.write("%s"% dumped )
+            for t in dumped.contents[2:]:
+                if t.__class__.__name__ == "Tag" and len(t.findAll("td"))>0:
+                    primer_bloque = t.findAll("td")[0]
+                    segundo_bloque = t.findAll("td")[1]
+                    tercer_bloque = t.findAll("td")[2]
+                    cuarto_bloque = t.findAll("td")[3]
+                    self.response.write("Primer : %s <br><br> Segundo : %s <br><br> Tercero : %s  <br><br> Cuarto :%s"% (primer_bloque,segundo_bloque,tercer_bloque,cuarto_bloque))
+                else:
+                    # TODO: Esta mal formateado el HTML asi que unas cosas las encuentro como String no como TAG. QUE MALA Pagina
+                    # self.response.write(t)
+                    pass
             
             
             
@@ -272,7 +282,6 @@ class DiputadoAsistenciasHandler(webapp2.RequestHandler):
     def get(self,id):
         
         asistencias = dict()
-        
         for index in range(1,6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/asistencias_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
             content = urlfetch.fetch(url,deadline=90).content
@@ -295,7 +304,7 @@ app = webapp2.WSGIApplication([
     ('/diputado/crawl$', DiputadosCrawlHandler),
     ('/diputado/(\d+)$', DiputadoHandler),
     ('/diputado/(\d+)/iniciativas$', DiputadoIniciativaHandler),
-    ('/diputado/(\d+)/proposiciones$', DiputadoIniciativaHandler),
+    ('/diputado/(\d+)/proposiciones$', DiputadoProposicionesHandler),
     ('/diputado/(\d+)/votaciones$', DiputadoVotacionesHandler),
     ('/diputado/(\d+)/asistencias$', DiputadoAsistenciasHandler),
 ], debug=True)
