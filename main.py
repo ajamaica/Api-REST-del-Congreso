@@ -5,6 +5,8 @@ from google.appengine.api import urlfetch
 from BeautifulSoup import *
 from google.appengine.ext import db
 import json as simplejson
+import os
+from google.appengine.ext.webapp import template
 
 def gql_json_parser(query_obj):
     result = []
@@ -56,7 +58,10 @@ class DiputadoComision(db.Model):
     
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        template_values = dict()
+        path = os.path.join(os.path.dirname(__file__),'templates', 'index.html')
+        self.response.out.write(template.render(path, template_values))
+        
 
 class IniciativaHandler(webapp2.RequestHandler):
     def get(self,id):
@@ -219,7 +224,6 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
 class DiputadoIniciativaHandler(webapp2.RequestHandler):
     def get(self,id):
         
-        
         for index in range(1,6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/iniciativas_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
             content = urlfetch.fetch(url,deadline=90).content
@@ -232,7 +236,6 @@ class DiputadoIniciativaHandler(webapp2.RequestHandler):
 
 class DiputadoProposicionesHandler(webapp2.RequestHandler):
     def get(self,id):
-        
         
         for index in range(1,6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
