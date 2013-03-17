@@ -92,7 +92,7 @@ class DiputadoHandler(webapp2.RequestHandler):
     
     def get(self,id):
         
-        obj_diputado = Diputado.get_or_insert(str(id))
+        obj_diputado = Diputado.get_by_key_name(id)
         self.response.write(simplejson.dumps( dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()])  ))
     
     def post(self,id):
