@@ -25,16 +25,7 @@ class Comision(db.Model):
     def __unicode__(self):
         return self.nombre
 
-class Iniciativa(db.Model):
-    nombre = db.StringProperty(required= False)
-    num = db.StringProperty(required= False)
-    turno = db.StringProperty(required= False)
-    comision = db.StringProperty(required= False)
-    resolutivos = db.StringProperty(required= False)
-    enlace = db.StringProperty(required= False)
     
-    def __unicode__(self):
-        return self.nombre      
           
 class Entidad(db.Model):
     nombre = db.StringProperty(required= False)
@@ -56,9 +47,25 @@ class Diputado(db.Model):
     foto = db.URLProperty()
     def __unicode__(self):
         return self.nombre
-    
 
+class Iniciativa(db.Model):
+    nombre = db.StringProperty(required= False)
+    num = db.StringProperty(required= False)
+    turno = db.StringProperty(required= False)
+    comision = db.StringProperty(required= False)
+    resolutivos = db.StringProperty(required= False)
+    enlace = db.StringProperty(required= False)
+    diputado = db.ReferenceProperty(Diputado,
+                                   required=False,
+                                   collection_name='diputado_ini')
+    
+    def __unicode__(self):
+        return self.nombre
+            
+
+    
 class DiputadoComision(db.Model):
+    
     diputado = db.ReferenceProperty(Diputado,
                                    required=True,
                                    collection_name='diputado')
@@ -271,6 +278,7 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
                     iniciativa.turno = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a').text
                     iniciativa.resolutivos = cells[4].findAll('span',{'class':'Estilo71'})[0].text
                     iniciativa.enlace = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a')["href"] 
+                    iniciativa.diputado = Diputado.get_or_insert(id)
                     iniciativa.put()
                     
                     result = []
