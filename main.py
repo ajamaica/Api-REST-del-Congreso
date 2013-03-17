@@ -186,7 +186,7 @@ class DiputadosHandler(webapp2.RequestHandler):
 class DiputadosCrawlHandler(webapp2.RequestHandler):
     
     
-    def get(self):
+    def post(self):
         
         url = "http://sitl.diputados.gob.mx/LXII_leg/listado_diputados_gpnp.php?tipot="
         content = urlfetch.fetch(url,deadline=90).content
@@ -357,9 +357,16 @@ class DiputadoAsistenciasHandler(webapp2.RequestHandler):
         del asistencias[""]
         self.response.write(simplejson.dumps(asistencias ))
                 
-            
+
+class RunnerHandler(webapp2.RequestHandler):
+    
+    def get(self):
+        taskqueue.add(url='/diputado/crawl')
+        self.response.write("Corriendo Task")
+        
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    ('/run', RunnerHandler),
     ('/iniciativa/(\d+)$', IniciativaHandler),
     ('/diputado/$', DiputadosHandler),
     ('/diputado/crawl$', DiputadosCrawlHandler),
