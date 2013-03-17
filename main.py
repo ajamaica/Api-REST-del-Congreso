@@ -93,6 +93,7 @@ class DiputadoHandler(webapp2.RequestHandler):
     def get(self,id):
         
         obj_diputado = Diputado.get_by_key_name(id)
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps( dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()])  ))
     
     def post(self,id):
@@ -135,6 +136,7 @@ class DiputadoHandler(webapp2.RequestHandler):
             
         result = []
         result.append(dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()]))
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps(  result ))
         
 
@@ -142,7 +144,7 @@ class DiputadosHandler(webapp2.RequestHandler):
     
     def get(self):
         teams = gql_json_parser(Diputado.all().order("nu_diputado")) 
-        
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps( teams ))
     
 
@@ -200,7 +202,7 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
                 # taskqueue.add(url='/diputado/%s/asistencias' % id_diputado)
                 
                 diputados.append({ "nu_diputado" :  obj_diputado.nu_diputado, "diputado" :  obj_diputado.nombre   , "partido" : fraccion.nombre })
-                
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps( diputados ))
         
 class DiputadoIniciativaHandler(webapp2.RequestHandler):
@@ -249,7 +251,7 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
                     
                     result = []
                     result.append(dict([(p, (unicode(getattr(iniciativa, p)))) for p in iniciativa.properties()]))
-                    
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps(result))
         
     def post(self,id):
@@ -272,7 +274,7 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
                     
                     result = []
                     result.append(dict([(p, (unicode(getattr(iniciativa, p)))) for p in iniciativa.properties()]))
-                    
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps(result))
             
 class DiputadoVotacionesHandler(webapp2.RequestHandler):
@@ -296,7 +298,7 @@ class DiputadoVotacionesHandler(webapp2.RequestHandler):
                     if (len(row.contents)) == 9:
                         data = [item.text for item in row.contents if item != "\n" and item.text != "&nbsp;" ]
                         votaciones[fecha.text].append({"id_dia":data[0],"titulo":data[1], "sentido":data[2]})
-                        
+        self.response.headers['Content-Type'] = 'application/json'                
         self.response.write(simplejson.dumps( votaciones ))
 
 class DiputadoAsistenciasHandler(webapp2.RequestHandler):
@@ -316,6 +318,7 @@ class DiputadoAsistenciasHandler(webapp2.RequestHandler):
                     for dia in mes.findAll("td",{"bgcolor" : "#D6E2E2"}):
                         asistencias[mes_txt.text].append({"dia": dia.find("font").contents[0], "estado" : dia.find("font").contents[2]})
         del asistencias[""]
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps(asistencias ))
                 
 
