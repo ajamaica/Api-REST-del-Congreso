@@ -183,9 +183,7 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
                 
                 if diputado.find("img")['src'] == 'images/panal.gif': 
                     fraccion =  Fraccion.get_or_insert("PANAL", nombre ="PANAL")
-                
-                #fraccion.put()
-                
+                                
             if diputado.find("a"):
                 
                 id_diputado = diputado.find("a")['href'].replace("curricula.php?dipt=","")

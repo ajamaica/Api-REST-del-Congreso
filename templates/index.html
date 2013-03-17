@@ -20,40 +20,29 @@
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
-      <script src="../assets/js/html5shiv.js"></script>
+      <script src="/static/bootstrap/js/html5shiv.js"></script>
     <![endif]-->
 
     <!-- Fav and touch icons -->
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/static/bootstrap/assets/ico/apple-touch-icon-144-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/static/bootstrap/assets/ico/apple-touch-icon-114-precomposed.png">
       <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/static/bootstrap/assets/ico/apple-touch-icon-72-precomposed.png">
-                    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
-                                   <link rel="shortcut icon" href="../assets/ico/favicon.png">
+                    <link rel="apple-touch-icon-precomposed" href="/static/bootstrap/ico/apple-touch-icon-57-precomposed.png">
+                                   <link rel="shortcut icon" href="/static/bootstrap/ico/favicon.png">
   </head>
 
   <body>
-         <!-- Navbar
-          ================================================== -->
-          <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="navbar-inner">
-              <div class="container">
-                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                </button>
-                <a class="brand" href="#">Bootstrap</a>
-                
-              </div>
-            </div>
-          </div>
+ 
+        
+        <a href="https://github.com/ajamaica/Api-REST-del-Congreso"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+        
 
       <!-- Subhead
       ================================================== -->
       <header class="jumbotron subhead" id="overview">
         <div class="container">
           <h1>API REST del Congreso</h1>
-          <p class="lead">Overview of the project, its contents, and how to get started with a simple template.</p>
+          <p class="lead">Servicio Open Source y totalmente gratuito que mapea el contenido generado por el congreso para que desarrolladores puedan construir lo que deseen.</p>
         </div>
       </header>
 
@@ -65,150 +54,74 @@
           <div class="row">
             <div class="span3 bs-docs-sidebar">
               <ul class="nav nav-list bs-docs-sidenav">
-                <li><a href="#download-bootstrap"><i class="icon-chevron-right"></i> Download</a></li>
-                <li><a href="#file-structure"><i class="icon-chevron-right"></i> File structure</a></li>
-                <li><a href="#contents"><i class="icon-chevron-right"></i> What's included</a></li>
-                <li><a href="#html-template"><i class="icon-chevron-right"></i> HTML template</a></li>
-                <li><a href="#what-next"><i class="icon-chevron-right"></i> What next?</a></li>
+                <li><a href="#diputado"><i class="icon-chevron-right"></i>Lista Diputados</a></li>
+                <li><a href="#diputado_id"><i class="icon-chevron-right"></i>Single Diputados</a></li>
+                <li><a href="#diputado_id_iniciativa"><i class="icon-chevron-right"></i>Iniciativas por Diputado</a></li>
+                <li><a href="#propociciones"><i class="icon-chevron-right"></i>Proposiciones por Diputado</a></li>
+                <li><a href="#votos"><i class="icon-chevron-right"></i>Votos por Diputado</a></li>
+                <li><a href="#asistentes"><i class="icon-chevron-right"></i>Asistentes por Diputado</a></li>
+                
               </ul>
             </div>
             <div class="span9">
 
 
 
-              <!-- Download
+              <!-- Lista diputados
               ================================================== -->
-              <section id="download-bootstrap">
+              <section id="diputado">
                 <div class="page-header">
-                  <h1>1. Download</h1>
+                  <h1>1. Diputados</h1>
                 </div>
-                <p class="lead">Before downloading, be sure to have a code editor (we recommend <a href="http://sublimetext.com/2">Sublime Text 2</a>) and some working knowledge of HTML and CSS. We won't walk through the source files here, but they are available for download. We'll focus on getting started with the compiled Bootstrap files.</p>
+                <p>Lista los diputados en JSON <code>/diputado/</code></p>
+                
+                 <pre class="prettyprint">[{"entidad": "Aguascalientes", "foto": "None", "tipo_de_eleccion": "Mayor\u00eda Relativa", "nu_diputado": "1", "distrito": "1", "fraccion": "PRI", "cabecera": "Jes\u00fas Mar\u00eda", "onomastico": "12-octubre", "suplente": " Laura Patricia Romo Castorena", "nombre": "Moreno Montoya J. Pilar", "curul": "A-009", "email": "pilar.moreno@congreso.gob.mx"}, {"entidad": "Aguascalientes", "foto": "None", "tipo_de_eleccion": "Mayor\u00eda Relativa", "nu_diputado": "2", "distrito": "2", "fraccion": "PAN", "cabecera": "Aguascalientes", "onomastico": "25-mayo", "suplente": " M\u00f3nica Becerra Moreno", "nombre": "Jim\u00e9nez Esquivel Mar\u00eda Teresa", "curul": "H-248", "email": "teresa.jimenez@congreso.gob.mx"}, {"entidad": "Aguascalientes", "foto": "None", "tipo_de_eleccion": "Mayor\u00eda Relativa", "nu_diputado": "3", "distrito": "3", "fraccion": "PAN", "cabecera": "Aguascalientes", "onomastico": "8-diciembre", "suplente": " H\u00e9ctor Eduardo Anaya P\u00e9rez", "nombre": "Gonz\u00e1lez Serna Jos\u00e9 \u00c1ngel", "curul": "A-002", "email": "jangel.gonzalez@congreso.gob.mx"}, {"entidad": "Baja California", "foto": "None", "tipo_de_eleccion": "Mayor\u00eda Relativa", "nu_diputado": "4", "distrito": "1", "fraccion": "PRI", "cabecera": "Mexicali", "onomastico": "30-marzo", "suplente": " Miguel Alfonso Vildosola Lacarra", "nombre": "Castillo Valdez Benjamin (LICENCIA)", "curul": "B-038", "email": "benjamin.castillo@congreso.gob.mx"}, {"entidad": "Baja California", "foto": "None", "tipo_de_eleccion": "Mayor\u00eda Relativa", "nu_diputado": "5", "distrito": "2", "fraccion": "PRI", "cabecera": "Mexicali", "onomastico": "9-septiembre", "suplente": " Beatriz Ariana Flores Alvarado", "nombre": "Schroeder Verdugo Mar\u00eda Fernanda", "curul": "C-067", "email": "maria.schroeder@congreso.gob.mx"}, {"entidad": "Baja California", "foto": "None", "tipo_de_eleccion": "Mayor\u00eda Relativa", "nu_diputado": "8", "distrito": "5", "fraccion": "PAN", "cabecera": "Tijuana", "onomastico": "31-octubre", "suplente": " Juan Andr\u00e9s Sollano Garc\u00eda", "nombre": "Gast\u00e9lum Buenrostro Juan Manuel", "curul": "H-244", "email": "juan.gastelum@congreso.gob.mx"}, {"entidad": "Baja California", "foto": "None", "tipo_de_eleccion": "Mayor\u00eda Relativa", "nu_diputado": "9", "distrito": "6", "fraccion": "PRI", "cabecera": "Tijuana", "onomastico": "17-septiembre", "suplente": " Mart\u00edn Plascencia \u00c1vila", "nombre": "L\u00f3pez Alvarado Jaime Chris", "curul": "H-267", "email": "chrislopez@congreso.gob.mx"}, ... ]
+                 </pre>
 
-                <div class="row-fluid">
-                  <div class="span6">
-                    <h2>Download compiled</h2>
-                    <p><strong>Fastest way to get started:</strong> get the compiled and minified versions of our CSS, JS, and images. No docs or original source files.</p>
-                    <p><a class="btn btn-large btn-primary" href="assets/bootstrap.zip" onclick="_gaq.push(['_trackEvent', 'Getting started', 'Download', 'Download compiled']);">Download Bootstrap</a></p>
-                  </div>
-                  <div class="span6">
-                    <h2>Download source</h2>
-                    <p>Get the original files for all CSS and JavaScript, along with a local copy of the docs by downloading the latest version directly from GitHub.</p>
-                    <p><a class="btn btn-large" href="https://github.com/twitter/bootstrap/zipball/master" onclick="_gaq.push(['_trackEvent', 'Getting started', 'Download', 'Download source']);">Download Bootstrap source</a></p>
-                  </div>
-                </div>
+                
               </section>
 
 
 
               <!-- File structure
               ================================================== -->
-              <section id="file-structure">
+              <section id="diputado_id">
                 <div class="page-header">
-                  <h1>2. File structure</h1>
+                  <h1>2. Single Diputados</h1>
                 </div>
-                <p class="lead">Within the download you'll find the following file structure and contents, logically grouping common assets and providing both compiled and minified variations.</p>
-                <p>Once downloaded, unzip the compressed folder to see the structure of (the compiled) Bootstrap. You'll see something like this:</p>
-      <pre class="prettyprint">
-        bootstrap/
-        ├── css/
-        │   ├── bootstrap.css
-        │   ├── bootstrap.min.css
-        ├── js/
-        │   ├── bootstrap.js
-        │   ├── bootstrap.min.js
-        └── img/
-            ├── glyphicons-halflings.png
-            └── glyphicons-halflings-white.png
-      </pre>
-                <p>This is the most basic form of Bootstrap: compiled files for quick drop-in usage in nearly any web project. We provide compiled CSS and JS (<code>bootstrap.*</code>), as well as compiled and minified CSS and JS (<code>bootstrap.min.*</code>). The image files are compressed using <a href="http://imageoptim.com/">ImageOptim</a>, a Mac app for compressing PNGs.</p>
-                <p>Please note that all JavaScript plugins require jQuery to be included.</p>
+                <p>Información en JSON dado un ID de diputado. <code>/diputado/{id}</code></p>
+                
+                <pre class="prettyprint">{"entidad": "M\u00e9xico", "foto": "None", "tipo_de_eleccion": "Mayor\u00eda Relativa", "nu_diputado": "153", "distrito": "28", "fraccion": "PRI", "cabecera": "Zumpango de Ocampo", "onomastico": "25-septiembre", "suplente": " Mar\u00eda Gabriela Bardales Hern\u00e1ndez", "nombre": "Bernal Bolnik Sue Ellen", "curul": "J-355", "email": "sue.bernal@congreso.gob.mx"}</pre>
+               
               </section>
 
 
 
               <!-- Contents
               ================================================== -->
-              <section id="contents">
+              <section id="diputado_id_iniciativa">
                 <div class="page-header">
-                  <h1>3. What's included</h1>
+                  <h1>3. Iniciativas por Diputado <span class="label label-warning">Un en Desarrollo</span></h1>
                 </div>
-                <p class="lead">Bootstrap comes equipped with HTML, CSS, and JS for all sorts of things, but they can be summarized with a handful of categories visible at the top of the <a href="http://getbootstrap.com">Bootstrap documentation</a>.</p>
-
-                <h2>Docs sections</h2>
-                <h4><a href="http://twitter.github.com/bootstrap/scaffolding.html">Scaffolding</a></h4>
-                <p>Global styles for the body to reset type and background, link styles, grid system, and two simple layouts.</p>
-                <h4><a href="http://twitter.github.com/bootstrap/base-css.html">Base CSS</a></h4>
-                <p>Styles for common HTML elements like typography, code, tables, forms, and buttons. Also includes <a href="http://glyphicons.com">Glyphicons</a>, a great little icon set.</p>
-                <h4><a href="http://twitter.github.com/bootstrap/components.html">Components</a></h4>
-                <p>Basic styles for common interface components like tabs and pills, navbar, alerts, page headers, and more.</p>
-                <h4><a href="http://twitter.github.com/bootstrap/javascript.html">JavaScript plugins</a></h4>
-                <p>Similar to Components, these JavaScript plugins are interactive components for things like tooltips, popovers, modals, and more.</p>
-
-                <h2>List of components</h2>
-                <p>Together, the <strong>Components</strong> and <strong>JavaScript plugins</strong> sections provide the following interface elements:</p>
-                <ul>
-                  <li>Button groups</li>
-                  <li>Button dropdowns</li>
-                  <li>Navigational tabs, pills, and lists</li>
-                  <li>Navbar</li>
-                  <li>Labels</li>
-                  <li>Badges</li>
-                  <li>Page headers and hero unit</li>
-                  <li>Thumbnails</li>
-                  <li>Alerts</li>
-                  <li>Progress bars</li>
-                  <li>Modals</li>
-                  <li>Dropdowns</li>
-                  <li>Tooltips</li>
-                  <li>Popovers</li>
-                  <li>Accordion</li>
-                  <li>Carousel</li>
-                  <li>Typeahead</li>
-                </ul>
-                <p>In future guides, we may walk through these components individually in more detail. Until then, look for each of these in the documentation for information on how to utilize and customize them.</p>
+                
+                <p>Información de Iniciativas en las que trabaja en JSON dado un ID de diputado. <code>/diputado/{id}/iniciativas</code></p>
+                <pre class="prettyprint"></pre>
+                
               </section>
 
 
 
               <!-- HTML template
               ================================================== -->
-              <section id="html-template">
+              <section id="propociciones">
                 <div class="page-header">
-                  <h1>4. Basic HTML template</h1>
+                  <h1>4. Proposiciones por Diputado</h1>
                 </div>
-                <p class="lead">With a brief intro into the contents out of the way, we can focus on putting Bootstrap to use. To do that, we'll utilize a basic HTML template that includes everything we mentioned in the <a href="./getting-started.html#file-structure">File structure</a>.</p>
-                <p>Now, here's a look at a <strong>typical HTML file</strong>:</p>
-      <pre class="prettyprint linenums">
-      &lt;!DOCTYPE html&gt;
-      &lt;html&gt;
-        &lt;head&gt;
-          &lt;title&gt;Bootstrap 101 Template&lt;/title&gt;
-          &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-        &lt;/head&gt;
-        &lt;body&gt;
-          &lt;h1&gt;Hello, world!&lt;/h1&gt;
-          &lt;script src="http://code.jquery.com/jquery.js"&gt;&lt;/script&gt;
-        &lt;/body&gt;
-      &lt;/html&gt;
-      </pre>
-                <p>To make this <strong>a Bootstrapped template</strong>, just include the appropriate CSS and JS files:</p>
-      <pre class="prettyprint linenums">
-      &lt;!DOCTYPE html&gt;
-      &lt;html&gt;
-        &lt;head&gt;
-          &lt;title&gt;Bootstrap 101 Template&lt;/title&gt;
-          &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-          &lt;!-- Bootstrap --&gt;
-          &lt;link href="css/bootstrap.min.css" rel="stylesheet" media="screen"&gt;
-        &lt;/head&gt;
-        &lt;body&gt;
-          &lt;h1&gt;Hello, world!&lt;/h1&gt;
-          &lt;script src="http://code.jquery.com/jquery.js"&gt;&lt;/script&gt;
-          &lt;script src="js/bootstrap.min.js"&gt;&lt;/script&gt;
-        &lt;/body&gt;
-      &lt;/html&gt;
-      </pre>
-                <p><strong>And you're set!</strong> With those two files added, you can begin to develop any site or application with Bootstrap.</p>
+                
+                 <p>Información de Proposiciones en JSON dado un ID de diputado. <code>/diputado/{id}/proposiciones</code></p>
+
+                    <pre class="prettyprint">[{"diputado": "breu Arti\u00f1ano Roc\u00edo Adriana", "resolutivos": "Aprobadacon fecha23-Enero-2013", "comision": "None", "num": "None", "turno": "23-Enero-2013", "enlace": "http://gaceta.diputados.gob.mx/Gaceta/62/2013/ene/20130123-IV.html#Proposicion7 ", "nombre": " Punto de acuerdo por el que la Comisi\u00f3n Permanente se solidariza con los productores de ca\u00f1a en sus demandas debido a la baja en el precio del az\u00facar."}]</pre>
+                    
               </section>
 
 
@@ -220,16 +133,25 @@
 
               <!-- Next
               ================================================== -->
-              <section id="what-next">
+              <section id="votos">
                 <div class="page-header">
-                  <h1>What next?</h1>
+                  <h1>5. Votos por Diputado</h1>
                 </div>
-                <p class="lead">Head to the docs for information, examples, and code snippets, or take the next leap and customize Bootstrap for any upcoming project.</p>
-                <a class="btn btn-large btn-primary" href="./scaffolding.html" onclick="_gaq.push(['_trackEvent', 'Getting started', 'Next steps', 'Visit docs']);">Visit the Bootstrap docs</a>
-                <a class="btn btn-large" href="./customize.html" style="margin-left: 5px;" onclick="_gaq.push(['_trackEvent', 'Getting started', 'Next steps', 'Customize']);">Customize Bootstrap</a>
+                
+                 <p>Información de Votaciones en JSON dado un ID de diputado. <code>/diputado/{id}/votaciones</code></p>
+
+                    <pre class="prettyprint">{"6 Diciembre 2012": [{"titulo": "DECRETO QUE ADICIONA UN SEGUNDO PARRAFO AL ARTICULO 9 DE LA LEY DE ENERGIA PARA EL CAMPO (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "1", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA, ADICIONA Y DEROGA DIVERSAS DISPOSICIONES DE LA LEY ORGANICA DE LA ARMADA DE MEXICO (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "2", "sentido": "A favor"}], "5 Marzo 2013": [{"titulo": "DECRETO QUE ADICIONA LA FRACCION I BIS AL ARTICULO 61 DE LA LEY GENERAL DE SALUD (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "1", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA Y DEROGA DIVERSAS DISPOSICIONES DE LOS ARTICULOS 61, 111, 112 Y 114 DE LA CPEUM (EN LO GENERAL Y EN LO PARTICULAR LOS ARTICULOS NO RESERVADOS)", "id_dia": "2", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA Y DEROGA DIV. DISP. DE LOS ARTICULOS 61, 111, 112 Y 114 DE LA CPEUM (EN LO PARTICULAR LOS ARTS. 61, 111 PARRAFOS PRIMERO EN SUS TERMINOS Y SEGUNDO Y CUARTO CON LAS MODIFICACIONES ACEPTADAS)", "id_dia": "3", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA Y DEROGA DIV. DISP. DE LOS ARTICULOS 61, 111, 112 Y 114 DE LA CPEUM (EN LO PARTICULAR EL ART. 111 PARRAFO QUINTO)", "id_dia": "4", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA Y DEROGA DIV. DISP. DE LOS ARTICULOS 61, 111, 112 Y 114 DE LA CPEUM (EN LO PARTICULAR EL ART. 111 PARRAFO SEXTO, OCTAVO, 114 RESERVADOS EN SUS TERMINOS)", "id_dia": "5", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA Y DEROGA DIV. DISP. DE LOS ARTICULOS 61, 111, 112 Y 114 DE LA CPEUM (EN LO PARTICULAR SEXTO TRANSITORIO CON LA MODIFICACION ACEPTADA)", "id_dia": "6", "sentido": "A favor"}], "26 Febrero 2013": [{"titulo": "DECRETO POR EL QUE SE REFORMAN Y ADICIONAN DIVERSAS DISPOSICIONES DE LA LEY GENERAL DE SALUD, EN MATERIA DE BANCOS DE SANGRE (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "1", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA LAS FRACCIONES I Y III DEL ARTICULO 245 DE LA LEY GENERAL DE SALUD (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "2", "sentido": "A favor"}, {"titulo": "DECRETO QUE ADICIONA UN SEGUNDO PARRAFO AL ARTICULO 41 DE LA LEY GENERAL DE TURISMO (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "3", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA LOS ARTICULOS 2, 3, 3 BIS Y 4, FRACCION I DE LA LEY DEL INSTITUTO MEXICANO DE LA JUVENTUD (EN LO GENERAL Y EN LO PARTICULAR CON LAS MODIFICACIONES ACEPTADAS)", "id_dia": "4", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA Y ADICIONA LOS ARTICULOS 61, 64 Y 79 DE LA LEY GENERAL DE SALUD, EN MATERIA DE PROFESIONALIZACION DE PARTERAS (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "5", "sentido": "A favor"}], "21 Febrero 2013": [{"titulo": "DECRETO POR EL QUE SE REFORMA EL DIVERSO POR EL QUE SE CREA LA MEDALLA AL M\u00c9RITO C\u00cdVICO EDUARDO NERI, LEGISLADORES DE 1913, PUBLICADO EN EL DIARIO OFICIAL DE LA FEDERACI\u00d3N EL 2 DE MAYO DE 2001; Y SE REFORMAN Y ADICIONAN DIVERSAS DISPOSICIONES DEL REGLAMENTO DE LA MEDALLA AL M\u00c9RITO C\u00cdVICO EDUARDO NERI, LEGISLADORES DE 1913 (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "1", "sentido": "A favor"}, {"titulo": "DECRETO QUE ESTABLECE LAS CARACTERISTICAS DE UNA MONEDA CONMEMORATIVA DEL 150 ANIVERSARIO DEL NATALICIO, Y EL 100 ANIVERSARIO LUCTUOSO DE BELISARIO DOMINGUEZ PALENCIA (EN LO GRAL Y EN LO PART.)", "id_dia": "2", "sentido": "A favor"}, {"titulo": "DECRETO QUE REFORMA EL ARTICULO 391, Y DEROGA LOS ARTICULOS DEL 402 AL 420 DEL CODIGO CIVIL FEDERAL (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "3", "sentido": "A favor"}, {"titulo": "DECRETO QUE ADICIONA UN ULTIMO PARRAFO AL ARTICULO 81 DE LA LEY ORGANICA DEL PODER JUDICIAL DE LA FEDERACION (EN LO GENERAL Y EN LO PARTICULAR)", "id_dia": "4", "sentido": "A favor"}, {"titulo": "DECRETO QUE ADICIONA DIVERSAS DISPOSICIONES A LOS ARTICULOS 4 Y 12 DE LA LEY GENERAL PARA EL DESARROLLO DE LA COMPETITIVIDAD DE LA MICRO, PEQUE\u00d1A Y MEDIANA EMPRESA (EN LO GRAL Y EN LO PART.)", "id_dia": "5", "sentido": "A favor"}], ... }</pre>
+                    
               </section>
 
-
+              <section id="asistentes">
+                  <div class="page-header">
+                    <h1>6. Asistencias por Diputado</h1>
+                  </div>
+                  
+                  <p>Información de Asistencias en JSON dado un ID de diputado. <code>/diputado/{id}/asistencias</code></p>
+                  <pre class="prettyprint">{"Noviembre 2012": [{"estado": "A", "dia": "6"}, {"estado": "A", "dia": "8"}, {"estado": "A", "dia": "13"}, {"estado": "A", "dia": "15"}, {"estado": "AC", "dia": "20"}, {"estado": "A", "dia": "22"}, {"estado": "A", "dia": "27"}, {"estado": "A", "dia": "28"}], "Octubre 2012": [{"estado": "A", "dia": "2"}, {"estado": "A", "dia": "4"}, {"estado": "A", "dia": "9"}, {"estado": "A", "dia": "11"}, {"estado": "A", "dia": "16"}, {"estado": "A", "dia": "18"}, {"estado": "A", "dia": "23"}, {"estado": "A", "dia": "25"}, {"estado": "A", "dia": "30"}, {"estado": "A", "dia": "31"}], "Febrero 2013": [{"estado": "A", "dia": "1"}, {"estado": "IJ", "dia": "6"}, {"estado": "A", "dia": "7"}, {"estado": "A", "dia": "12"}, {"estado": "A", "dia": "14"}, {"estado": "A", "dia": "19"}, {"estado": "A", "dia": "21"}, {"estado": "I", "dia": "22"}, {"estado": "A", "dia": "26"}], "Diciembre 2012": [{"estado": "A", "dia": "1"}, {"estado": "A", "dia": "4"}, {"estado": "A", "dia": "6"}, {"estado": "A", "dia": "11"}, {"estado": "A", "dia": "12"}, {"estado": "A", "dia": "13"}, {"estado": "A", "dia": "18"}, {"estado": "A", "dia": "19"}, {"estado": "A", "dia": "20"}, {"estado": "A", "dia": "21"}], "Abril 2013": [], "Marzo 2013": [], "Septiembre 2012": [{"estado": "A", "dia": "1"}, {"estado": "A", "dia": "4"}, {"estado": "A", "dia": "6"}, {"estado": "A", "dia": "11"}, {"estado": "A", "dia": "13"}, {"estado": "A", "dia": "18"}, {"estado": "A", "dia": "20"}, {"estado": "A", "dia": "25"}, {"estado": "A", "dia": "27"}, {"estado": "A/A", "dia": "28"}]}</pre>
+                </section>
 
 
             </div>
@@ -244,19 +166,19 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="../assets/js/jquery.js"></script>
-    <script src="../assets/js/bootstrap-transition.js"></script>
-    <script src="../assets/js/bootstrap-alert.js"></script>
-    <script src="../assets/js/bootstrap-modal.js"></script>
-    <script src="../assets/js/bootstrap-dropdown.js"></script>
-    <script src="../assets/js/bootstrap-scrollspy.js"></script>
-    <script src="../assets/js/bootstrap-tab.js"></script>
-    <script src="../assets/js/bootstrap-tooltip.js"></script>
-    <script src="../assets/js/bootstrap-popover.js"></script>
-    <script src="../assets/js/bootstrap-button.js"></script>
-    <script src="../assets/js/bootstrap-collapse.js"></script>
-    <script src="../assets/js/bootstrap-carousel.js"></script>
-    <script src="../assets/js/bootstrap-typeahead.js"></script>
+    <script src="/static/bootstrap/js/jquery.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-transition.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-alert.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-modal.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-tab.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-popover.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-button.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="/static/bootstrap/js/bootstrap-typeahead.js"></script>
 
   </body>
 </html>
