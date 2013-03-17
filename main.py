@@ -91,46 +91,9 @@ class IniciativaHandler(webapp2.RequestHandler):
 class DiputadoHandler(webapp2.RequestHandler):
     
     def get(self,id):
-        url = "http://sitl.diputados.gob.mx/LXII_leg/curricula.php?dipt=%s" % id
-        content = urlfetch.fetch(url,deadline=90).content
-        soup = BeautifulSoup(content)
-        dumped = soup.find("table").findAll("tr")[2].findAll("table")[1]
-        
-        entidad_n =  dumped.findAll("tr")[2].text.split(":")[1]
-        tipo_de_eleccion = dumped.findAll("tr")[1].text.split(":")[1]
-        distrito =  dumped.findAll("tr")[3].text.split(":")[1]
-        cabecera = dumped.findAll("tr")[4].text.split(":")[1]
-        curul = dumped.findAll("tr")[5].text.split(":")[1]
-        suplente =  dumped.findAll("tr")[6].text.split(":")[1]
-        onomastico = dumped.findAll("tr")[7].text.split(":")[1]
-        email = dumped.findAll("tr")[8].text.split(":")[1]
-        comisiones = soup.find("table").findAll("a",{"href" : re.compile("integrantes_de_comisionlx")})
         
         obj_diputado = Diputado.get_or_insert(str(id))
-        entidad = Entidad.get_or_insert(entidad_n)
-        entidad.nombre = entidad_n
-        entidad.put()
-        
-        obj_diputado.entidad = entidad
-        obj_diputado.tipo_de_eleccion = tipo_de_eleccion
-        obj_diputado.distrito = int(distrito)
-        obj_diputado.cabecera =  cabecera
-        obj_diputado.curul =  curul
-        obj_diputado.suplente = suplente
-        obj_diputado.onomastico = onomastico
-        obj_diputado.email  = email
-        obj_diputado.put()
-        
-        for comision in comisiones:
-            com = Comision.get_or_insert(str(comision['href'].replace("integrantes_de_comisionlxii.php?comt=","")))
-            com.nombre = comision.text
-            com.put()
-            relation = DiputadoComision(comision = com,diputado = obj_diputado)
-            relation.put()
-            
-        result = []
-        result.append(dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()]))
-        self.response.write(simplejson.dumps(  result ))
+        self.response.write(simplejson.dumps( dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()])  ))
     
     def post(self,id):
         url = "http://sitl.diputados.gob.mx/LXII_leg/curricula.php?dipt=%s" % id
@@ -269,7 +232,7 @@ class DiputadoIniciativaHandler(webapp2.RequestHandler):
 class DiputadoProposicionesHandler(webapp2.RequestHandler):
     
     def get(self,id):
-        
+        result = []
         for index in range(1,6):
             url = "http://sitl.diputados.gob.mx/LXII_leg/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
             content = urlfetch.fetch(url,deadline=90).content
@@ -284,7 +247,7 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
                     iniciativa.resolutivos = cells[4].findAll('span',{'class':'Estilo71'})[0].text
                     iniciativa.enlace = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a')["href"] 
                     iniciativa.diputado = Diputado.get_or_insert(id)
-                    iniciativa.put()
+                    #iniciativa.put()
                     
                     result = []
                     result.append(dict([(p, (unicode(getattr(iniciativa, p)))) for p in iniciativa.properties()]))
