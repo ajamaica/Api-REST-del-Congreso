@@ -136,55 +136,6 @@ class DiputadosHandler(webapp2.RequestHandler):
         
         self.response.write(simplejson.dumps( teams ))
     
-    def crawl(self):
-        
-        url = "http://sitl.diputados.gob.mx/LXII_leg/listado_diputados_gpnp.php?tipot="
-        content = urlfetch.fetch(url,deadline=90).content
-        soup = BeautifulSoup(content)
-        dumped = soup.find("table").findAll("table")[1].findAll("tr")
-
-        diputados = list(dict())
-        fraccion =  Fraccion()
-        indexP = 0
-        
-        for diputado in dumped:
-            
-            if diputado.find("img"):
-                if diputado.find("img")['src'] == 'images/pri01.png':
-                    fraccion =  Fraccion.get_or_insert("PRI", nombre ="PRI")
-                
-                if diputado.find("img")['src'] == 'images/pan.png':
-                    fraccion =  Fraccion.get_or_insert("PAN", nombre ="PAN")
-                
-                if diputado.find("img")['src'] == 'images/prd01.png':
-                    fraccion =  Fraccion.get_or_insert("PRD", nombre ="PRD")
-                
-                if diputado.find("img")['src'] == 'images/logvrd.jpg': 
-                    fraccion =  Fraccion.get_or_insert("VERDE", nombre ="Verde")
-                
-                if diputado.find("img")['src'] == 'images/logo_movimiento_ciudadano.png': 
-                    fraccion =  Fraccion.get_or_insert("MOVCI", nombre ="Movimiento Ciudadano")
-
-                if diputado.find("img")['src'] == 'images/logpt.jpg': 
-                    fraccion =  Fraccion.get_or_insert("PT", nombre ="PT")
-                
-                if diputado.find("img")['src'] == 'images/panal.gif': 
-                    fraccion =  Fraccion.get_or_insert("PANAL", nombre ="PANAL")
-                
-                #fraccion.put()
-                
-            if diputado.find("a"):
-                
-                id_diputado = diputado.find("a")['href'].replace("curricula.php?dipt=","")
-                obj_diputado = Diputado.get_or_insert(id_diputado)
-                obj_diputado.nombre = diputado.find("a").text[3:].strip()
-                obj_diputado.nu_diputado = int(id_diputado)
-                obj_diputado.fraccion = fraccion
-                obj_diputado.put()
-                
-                diputados.append({ "nu_diputado" :  obj_diputado.nu_diputado, "diputado" :  obj_diputado.nombre   , "partido" : fraccion.nombre })
-                
-        self.response.write(simplejson.dumps( diputados ))
 
 class DiputadosCrawlHandler(webapp2.RequestHandler):
     
