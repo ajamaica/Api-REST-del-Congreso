@@ -31,6 +31,7 @@ class Iniciativa(db.Model):
     turno = db.StringProperty(required= False)
     comision = db.StringProperty(required= False)
     resolutivos = db.StringProperty(required= False)
+    enlace = db.StringProperty(required= False)
     
     def __unicode__(self):
         return self.nombre      
@@ -265,10 +266,17 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
             if dumped.findAll("tr")[1] :
                 cells = dumped.findAll("tr")[1].findAll("td")
                 if len(cells) :
-                    self.response.write( "Primero %s" % cells[0].contents[0].text )
-                    self.response.write( "Segundo %s" % cells[1] )
-                    self.response.write( "Tercero %s" % cells[4] )
+                    iniciativa = Iniciativa.get_or_insert(cells[0].contents[0].text.split('&nbsp;')[1])
+                    iniciativa.nombre = cells[0].contents[0].text.split('&nbsp;')[1]
+                    iniciativa.turno = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a').text
+                    iniciativa.resolutivos = cells[4].findAll('span',{'class':'Estilo71'})[0].text
+                    iniciativa.enlace = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a')["href"] 
+                    iniciativa.put()
                     
+                    result = []
+                    result.append(dict([(p, (unicode(getattr(iniciativa, p)))) for p in iniciativa.properties()]))
+                    
+        self.response.write(simplejson.dumps(result))
             
 class DiputadoVotacionesHandler(webapp2.RequestHandler):
     def get(self,id):
