@@ -192,11 +192,6 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
                 obj_diputado.fraccion = fraccion
                 obj_diputado.put()
                 
-                parsedipquery = DiputadoP.Query.all().where(nu_diputado=int(id_diputado))
-                for parsedip in parsedipquery:
-                    parsedip.nombre = obj_diputado.nombre
-                    parsedip.save()
-                    break
                 
                 #taskqueue.add(url='/diputado/%s' % id_diputado)
                 #taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
