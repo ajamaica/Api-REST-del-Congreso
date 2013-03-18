@@ -8,72 +8,21 @@ import json as simplejson
 import os
 from google.appengine.ext.webapp import template
 from google.appengine.api import taskqueue
+from parse_rest.connection import register
+from settings_local import *
+from parse_rest.datatypes import Object
+from Models.models import *
+from Models.models_parse import *
+
+register(APPLICATION_ID, REST_API_KEY, master_key=MASTER_KEY)
+
 
 def gql_json_parser(query_obj):
     result = []
     for entry in query_obj:
         result.append(dict([(p, (unicode(getattr(entry, p)))) for p in entry.properties()]))
     return result
-    
-class Fraccion(db.Model):
-    nombre = db.StringProperty(required= False)
-    def __unicode__(self):
-        return self.nombre
-        
-class Comision(db.Model):
-    nombre = db.StringProperty(required= False)
-    num = db.StringProperty(required= False)
-    def __unicode__(self):
-        return self.nombre
 
-    
-          
-class Entidad(db.Model):
-    nombre = db.StringProperty(required= False)
-    def __unicode__(self):
-        return self.nombre
-        
-class Diputado(db.Model):
-    nombre = db.StringProperty()
-    distrito = db.IntegerProperty(default=0)
-    nu_diputado = db.IntegerProperty(default=0)
-    fraccion = db.ReferenceProperty(Fraccion,collection_name="fraccion")
-    cabecera =  db.StringProperty()
-    tipo_de_eleccion = db.StringProperty()
-    entidad = db.ReferenceProperty(Entidad,collection_name="entidad")
-    curul = db.StringProperty()
-    suplente = db.StringProperty()
-    email = db.EmailProperty()
-    onomastico = db.StringProperty()
-    foto = db.URLProperty()
-    def __unicode__(self):
-        return self.nombre
-
-class Iniciativa(db.Model):
-    nombre = db.StringProperty(required= False)
-    num = db.StringProperty(required= False)
-    turno = db.StringProperty(required= False)
-    comision = db.StringProperty(required= False)
-    resolutivos = db.StringProperty(required= False)
-    enlace = db.StringProperty(required= False)
-    diputado = db.ReferenceProperty(Diputado,
-                                   required=False,
-                                   collection_name='diputado_ini')
-    
-    def __unicode__(self):
-        return self.nombre
-            
-
-    
-class DiputadoComision(db.Model):
-    
-    diputado = db.ReferenceProperty(Diputado,
-                                   required=True,
-                                   collection_name='diputado')
-    comision = db.ReferenceProperty(Comision,
-                                   required=True,
-                                   collection_name='comision')
-    titulo = db.StringProperty()
     
 class MainHandler(webapp2.RequestHandler):
     
@@ -117,7 +66,20 @@ class DiputadoHandler(webapp2.RequestHandler):
         entidad.nombre = entidad_n
         entidad.put()
         
-        obj_diputado.entidad = entidad
+        """
+        parseentpquery = EntidadP.Query.all().where(nombre=entidad_n)
+        entityparse = ""
+        
+        for ent in parseentpquery:
+            entityparse = ent
+            break
+        
+        if not entityparse:
+            entityparse = EntidadP(nombre = entidad_n)
+            entityparse.save()
+        """
+        
+        #obj_diputado.entidad = entidad
         obj_diputado.tipo_de_eleccion = tipo_de_eleccion
         obj_diputado.distrito = int(distrito)
         obj_diputado.cabecera =  cabecera
@@ -127,12 +89,47 @@ class DiputadoHandler(webapp2.RequestHandler):
         obj_diputado.email  = email
         obj_diputado.put()
         
+        
+        parsedipquery = DiputadoP.Query.all().where(nu_diputado=int(id))
+        for parsedip in parsedipquery:
+            parsedip.tipo_de_eleccion = tipo_de_eleccion
+            parsedip.distrito = int(distrito)
+            parsedip.cabecera =  cabecera
+            parsedip.curul =  curul
+            parsedip.suplente = suplente
+            parsedip.onomastico = onomastico
+            parsedip.email  = email
+            parsedip.save()
+            break
+        
+        
+        
+        
+            
         for comision in comisiones:
             com = Comision.get_or_insert(str(comision['href'].replace("integrantes_de_comisionlxii.php?comt=","")))
             com.nombre = comision.text
             com.put()
             relation = DiputadoComision(comision = com,diputado = obj_diputado)
             relation.put()
+            
+            parsecomipquery = ComisionP.Query.all().where(num_comi=str(comision['href'].replace("integrantes_de_comisionlxii.php?comt=","")))
+            comipparse = ""
+
+            for con in parsecomipquery:
+                comipparse = con
+                break
+
+            if not comipparse:
+                comipparse = ComisionP(num_comi = str(comision['href'].replace("integrantes_de_comisionlxii.php?comt=","")))
+                comipparse.nombre = comision.text
+                comipparse.save()
+            else:
+                comipparse.nombre = comision.text
+                comipparse.save()
+                
+            parsedip.comisiones =  comipparse
+            parsedip.save()
             
         result = []
         result.append(dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()]))
@@ -151,7 +148,7 @@ class DiputadosHandler(webapp2.RequestHandler):
 class DiputadosCrawlHandler(webapp2.RequestHandler):
     
     
-    def post(self):
+    def get(self):
         
         url = "http://sitl.diputados.gob.mx/LXII_leg/listado_diputados_gpnp.php?tipot="
         content = urlfetch.fetch(url,deadline=90).content
@@ -190,13 +187,19 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
                 
                 id_diputado = diputado.find("a")['href'].replace("curricula.php?dipt=","")
                 obj_diputado = Diputado.get_or_insert(id_diputado)
-                obj_diputado.nombre = diputado.find("a").text[3:].strip()
+                obj_diputado.nombre = " ".join(diputado.find("a").text.strip().split(" ")[1:])
                 obj_diputado.nu_diputado = int(id_diputado)
                 obj_diputado.fraccion = fraccion
                 obj_diputado.put()
                 
-                taskqueue.add(url='/diputado/%s' % id_diputado)
-                taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
+                parsedipquery = DiputadoP.Query.all().where(nu_diputado=int(id_diputado))
+                for parsedip in parsedipquery:
+                    parsedip.nombre = obj_diputado.nombre
+                    parsedip.save()
+                    break
+                
+                #taskqueue.add(url='/diputado/%s' % id_diputado)
+                #taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/votaciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/asistencias' % id_diputado)
@@ -247,7 +250,7 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
                     iniciativa.resolutivos = cells[4].findAll('span',{'class':'Estilo71'})[0].text
                     iniciativa.enlace = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a')["href"] 
                     iniciativa.diputado = Diputado.get_or_insert(id)
-                    #iniciativa.put()
+                    iniciativa.put()
                     
                     result = []
                     result.append(dict([(p, (unicode(getattr(iniciativa, p)))) for p in iniciativa.properties()]))
@@ -325,7 +328,8 @@ class DiputadoAsistenciasHandler(webapp2.RequestHandler):
 class RunnerHandler(webapp2.RequestHandler):
     
     def get(self):
-        taskqueue.add(url='/diputado/crawl')
+        taskqueue.add(url='/diputado/crawl') 
+        #taskqueue.add(url='/diputado/15')       
         self.response.write("Corriendo Task")
         
 app = webapp2.WSGIApplication([
