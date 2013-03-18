@@ -190,7 +190,7 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
                 
                 id_diputado = diputado.find("a")['href'].replace("curricula.php?dipt=","")
                 obj_diputado = Diputado.get_or_insert(id_diputado)
-                obj_diputado.nombre = diputado.find("a").text[3:].strip()
+                obj_diputado.nombre = " ".join(diputado.find("a").text.strip().split(" ")[1:])
                 obj_diputado.nu_diputado = int(id_diputado)
                 obj_diputado.fraccion = fraccion
                 obj_diputado.put()
