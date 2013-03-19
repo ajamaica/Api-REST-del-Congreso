@@ -38,13 +38,13 @@ class IniciativaHandler(webapp2.RequestHandler):
         self.response.write('Hello world!')
 
 class DiputadoHandler(webapp2.RequestHandler):
-    
+    """
     def get(self,id):
         
         obj_diputado = Diputado.get_by_key_name(id)
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps( dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()])  ))
-    
+    """
     def post(self,id):
         url = "http://sitl.diputados.gob.mx/LXII_leg/curricula.php?dipt=%s" % id
         content = urlfetch.fetch(url,deadline=90).content
@@ -60,6 +60,9 @@ class DiputadoHandler(webapp2.RequestHandler):
         onomastico = dumped.findAll("tr")[7].text.split(":")[1]
         email = dumped.findAll("tr")[8].text.split(":")[1]
         comisiones = soup.find("table").findAll("a",{"href" : re.compile("integrantes_de_comisionlx")})
+        imagen_ele = "http://sitl.diputados.gob.mx/LXII_leg/%s" % soup.find("table").findAll("img",{"width" : "350"})[0]['src'].replace("./","")
+
+        
         
         obj_diputado = Diputado.get_or_insert(str(id))
         entidad = Entidad.get_or_insert(entidad_n)
@@ -93,6 +96,7 @@ class DiputadoHandler(webapp2.RequestHandler):
         parsedipquery = DiputadoP.Query.all().where(nu_diputado=int(id))
         for parsedip in parsedipquery:
             parsedip.tipo_de_eleccion = tipo_de_eleccion
+            parsedip.avatar = imagen_ele
             parsedip.distrito = int(distrito)
             parsedip.cabecera =  cabecera
             parsedip.curul =  curul
@@ -105,7 +109,7 @@ class DiputadoHandler(webapp2.RequestHandler):
         
         
         
-            
+            """
         for comision in comisiones:
             com = Comision.get_or_insert(str(comision['href'].replace("integrantes_de_comisionlxii.php?comt=","")))
             com.nombre = comision.text
@@ -130,6 +134,7 @@ class DiputadoHandler(webapp2.RequestHandler):
                 
             parsedip.comisiones =  comipparse
             parsedip.save()
+            """
             
         result = []
         result.append(dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()]))
@@ -194,7 +199,7 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
                 
                 
                 #taskqueue.add(url='/diputado/%s' % id_diputado)
-                #taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
+                taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/votaciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/asistencias' % id_diputado)
@@ -255,6 +260,13 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
     def post(self,id):
         
         for index in range(1,6):
+            
+            parsedip = object()
+            parsedipquery = DiputadoP.Query.all().where(nu_diputado=int(id))
+            for parsedip2 in parsedipquery:
+                parsedip = parsedip2
+                break
+                
             url = "http://sitl.diputados.gob.mx/LXII_leg/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
@@ -269,6 +281,31 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
                     iniciativa.enlace = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a')["href"] 
                     iniciativa.diputado = Diputado.get_or_insert(id)
                     iniciativa.put()
+                    
+
+                    
+                    parseiniciaquery = IniciativaP.Query.all().where(nombre=iniciativa.nombre)
+                    iniciapparse = ""
+
+                    for con in parseiniciaquery:
+                        iniciapparse = con
+                        break
+
+                    if not iniciapparse:
+                        iniciapparse = IniciativaP(nombre = iniciativa.nombre)
+                        iniciapparse.turno = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a').text
+                        iniciapparse.resolutivos = cells[4].findAll('span',{'class':'Estilo71'})[0].text
+                        iniciapparse.enlace = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a')["href"]
+                        iniciapparse.diputado = parsedip
+                        iniciapparse.save()
+                    else:
+                        iniciapparse.turno = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a').text
+                        iniciapparse.resolutivos = cells[4].findAll('span',{'class':'Estilo71'})[0].text
+                        iniciapparse.enlace = cells[4].findAll('span',{'class':'Estilo71'})[1].find('a')["href"]
+                        iniciapparse.diputado = parsedip
+                        iniciapparse.save()
+                        
+                    
                     
                     result = []
                     result.append(dict([(p, (unicode(getattr(iniciativa, p)))) for p in iniciativa.properties()]))
@@ -324,7 +361,7 @@ class RunnerHandler(webapp2.RequestHandler):
     
     def get(self):
         taskqueue.add(url='/diputado/crawl') 
-        #taskqueue.add(url='/diputado/15')       
+        #taskqueue.add(url='/diputado/15/proposiciones')  
         self.response.write("Corriendo Task")
         
 app = webapp2.WSGIApplication([
