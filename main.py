@@ -364,9 +364,44 @@ class RunnerHandler(webapp2.RequestHandler):
         #taskqueue.add(url='/diputado/15/proposiciones')  
         self.response.write("Corriendo Task")
         
+
+class ComisionesHandler(webapp2.RequestHandler):
+    
+    def get(self):
+        comiciones = list()
+        url = "http://sitl.diputados.gob.mx/LXII_leg/listado_de_comisioneslxii.php?tct=1"
+        content = urlfetch.fetch(url,deadline=90).content
+        soup = BeautifulSoup(content)
+        tr = soup.findAll('table')[0].findAll("table")[1].findAll("tr")[5:]
+        for row in tr:
+            if row.find("a"):
+                nombre = row.find("a").text
+                num_comi = row.find("a")['href'].replace("integrantes_de_comisionlxii.php?comt=","")
+                comiciones.append({"nombre" : nombre, "num_comi": num_comi})
+                
+                
+                parsecomi = ComisionP.Query.all().where(nombre=nombre)
+                comipa = ""
+
+                for con in parsecomi:
+                    comipa = con
+                    break
+
+                if not comipa:
+                    comipa = ComisionP(nombre = nombre)
+                    comipa.num_comi = num_comi
+                    comipa.save()
+                else:
+                    comipa.num_comi = num_comi
+                    comipa.save()
+        
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(simplejson.dumps(comiciones))
+        
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/run', RunnerHandler),
+    ('/comisiones/$', ComisionesHandler),
     ('/iniciativa/(\d+)$', IniciativaHandler),
     ('/diputado/$', DiputadosHandler),
     ('/diputado/crawl$', DiputadosCrawlHandler),
