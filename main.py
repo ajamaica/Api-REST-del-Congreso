@@ -195,8 +195,8 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
                 obj_diputado.fraccion = fraccion
                 obj_diputado.put()
                 
-                taskqueue.add(url='/diputado/%s' % id_diputado)
-                taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
+                #taskqueue.add(url='/diputado/%s' % id_diputado)
+                #taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/votaciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/asistencias' % id_diputado)
@@ -249,7 +249,6 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
                     iniciativa.diputado = Diputado.get_or_insert(id)
                     #iniciativa.put()
                     
-                    result = []
                     result.append(dict([(p, (unicode(getattr(iniciativa, p)))) for p in iniciativa.properties()]))
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps(result))
@@ -328,9 +327,30 @@ class RunnerHandler(webapp2.RequestHandler):
         taskqueue.add(url='/diputado/crawl')
         self.response.write("Corriendo Task")
         
+
+class ComisionesHandler(webapp2.RequestHandler):
+    
+    def get(self):
+        comiciones = list()
+        url = "http://sitl.diputados.gob.mx/LXII_leg/listado_de_comisioneslxii.php?tct=1"
+        content = urlfetch.fetch(url,deadline=90).content
+        soup = BeautifulSoup(content)
+        tr = soup.findAll('table')[0].findAll("table")[1].findAll("tr")[5:]
+        for row in tr:
+            if row.find("a"):
+                nombre = row.find("a").text
+                num_comi = row.find("a")['href'].replace("integrantes_de_comisionlxii.php?comt=","")
+                comiciones.append({"nombre" : nombre, "num_comi": num_comi})
+                
+        
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(simplejson.dumps(comiciones))
+        
+        
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/run', RunnerHandler),
+    ('/comisiones/$', ComisionesHandler),
     ('/iniciativa/(\d+)$', IniciativaHandler),
     ('/diputado/$', DiputadosHandler),
     ('/diputado/crawl$', DiputadosCrawlHandler),
