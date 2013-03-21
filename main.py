@@ -281,7 +281,7 @@ class DiputadoVotacionesHandler(webapp2.RequestHandler):
     def get(self,id):
         
         votaciones = dict()
-        for index in range(1,6):
+        for index in reversed(range(1,6)):
             url = "http://sitl.diputados.gob.mx/LXII_leg/votaciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
@@ -345,12 +345,33 @@ class ComisionesHandler(webapp2.RequestHandler):
         
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(simplejson.dumps(comiciones))
-        
+
+class ComisionHandler(webapp2.RequestHandler):
+    
+    def get(self,id):
+        diputados = dict()
+        url = "http://sitl.diputados.gob.mx/LXII_leg/integrantes_de_comisionlxii.php?comt=%s" % id
+        content = urlfetch.fetch(url,deadline=90).content
+        soup = BeautifulSoup(content)
+        tr = soup.findAll('table')[0].findAll("table")[1].findAll("tr")[5:]
+        comi = ""
+        for row in tr:
+            
+            if len(row.findAll("td")) == 1 :
+                diputados[row.text] = list()
+                comi = row.text
+                #self.response.write("%s" % row.text)
+            if len(row.findAll("td")) == 5 :
+                diputados[comi].append({"num_dip": row.find("a")["href"].replace("curricula.php?dipt=","")})
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(simplejson.dumps(diputados))
+
         
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/run', RunnerHandler),
-    ('/comisiones/$', ComisionesHandler),
+    ('/comision/$', ComisionesHandler),
+    ('/comision/(\d+)$', ComisionHandler),
     ('/iniciativa/(\d+)$', IniciativaHandler),
     ('/diputado/$', DiputadosHandler),
     ('/diputado/crawl$', DiputadosCrawlHandler),
