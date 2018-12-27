@@ -9,6 +9,8 @@ import os
 from google.appengine.ext.webapp import template
 from google.appengine.api import taskqueue
 
+ACTUAL_LEG = "LXIV_leg"
+
 def gql_json_parser(query_obj):
     result = []
     for entry in query_obj:
@@ -97,11 +99,12 @@ class DiputadoHandler(webapp2.RequestHandler):
         self.response.write(simplejson.dumps( dict([(p, (unicode(getattr(obj_diputado, p)))) for p in obj_diputado.properties()])  ))
     
     def post(self,id):
-        url = "http://sitl.diputados.gob.mx/LXII_leg/curricula.php?dipt=%s" % id
+        url = "http://sitl.diputados.gob.mx/%s/curricula.php?dipt=%s" % (ACTUAL_LEG,id)
         content = urlfetch.fetch(url,deadline=90).content
         soup = BeautifulSoup(content)
-        dumped = soup.find("table").findAll("tr")[2].findAll("table")[1]
-        
+        dumped = soup.find("table").findAll("tr")
+        print dumped
+        return
         entidad_n =  dumped.findAll("tr")[2].text.split(":")[1]
         tipo_de_eleccion = dumped.findAll("tr")[1].text.split(":")[1]
         distrito =  dumped.findAll("tr")[3].text.split(":")[1]
@@ -153,7 +156,7 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
     
     def post(self):
         
-        url = "http://sitl.diputados.gob.mx/LXII_leg/listado_diputados_gpnp.php?tipot="
+        url = "http://sitl.diputados.gob.mx/%s/listado_diputados_gpnp.php?tipot=" % ACTUAL_LEG
         content = urlfetch.fetch(url,deadline=90).content
         soup = BeautifulSoup(content)
         dumped = soup.find("table").findAll("table")[1].findAll("tr")
@@ -192,10 +195,10 @@ class DiputadosCrawlHandler(webapp2.RequestHandler):
                 obj_diputado = Diputado.get_or_insert(id_diputado)
                 obj_diputado.nombre = " ".join(diputado.find("a").text.strip().split(" ")[1:])
                 obj_diputado.nu_diputado = int(id_diputado)
-                obj_diputado.fraccion = fraccion
+                #obj_diputado.fraccion = fraccion
                 obj_diputado.put()
                 
-                #taskqueue.add(url='/diputado/%s' % id_diputado)
+                taskqueue.add(url='/diputado/%s' % id_diputado)
                 #taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/proposiciones' % id_diputado)
                 # taskqueue.add(url='/diputado/%s/votaciones' % id_diputado)
@@ -210,7 +213,7 @@ class DiputadoIniciativaHandler(webapp2.RequestHandler):
     def get(self,id):
         
         for index in range(1,6):
-            url = "http://sitl.diputados.gob.mx/LXII_leg/iniciativas_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
+            url = "http://sitl.diputados.gob.mx/%s/iniciativas_por_pernplxii.php?iddipt=%s&pert=%i" % (ACTUAL_LEG,id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[1]
@@ -234,7 +237,7 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
     def get(self,id):
         result = []
         for index in range(1,6):
-            url = "http://sitl.diputados.gob.mx/LXII_leg/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
+            url = "http://sitl.diputados.gob.mx/%s/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (ACTUAL_LEG,id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[1]
@@ -256,7 +259,7 @@ class DiputadoProposicionesHandler(webapp2.RequestHandler):
     def post(self,id):
         
         for index in range(1,6):
-            url = "http://sitl.diputados.gob.mx/LXII_leg/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
+            url = "http://sitl.diputados.gob.mx/%s/proposiciones_por_pernplxii.php?iddipt=%s&pert=%i" % (ACTUAL_LEG,id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[1]
@@ -282,7 +285,7 @@ class DiputadoVotacionesHandler(webapp2.RequestHandler):
         
         votaciones = dict()
         for index in reversed(range(1,6)):
-            url = "http://sitl.diputados.gob.mx/LXII_leg/votaciones_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
+            url = "http://sitl.diputados.gob.mx/%s/votaciones_por_pernplxii.php?iddipt=%s&pert=%i" % (ACTUAL_LEG,id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[0].findAll("table")[1]
@@ -306,7 +309,7 @@ class DiputadoAsistenciasHandler(webapp2.RequestHandler):
         
         asistencias = dict()
         for index in range(1,6):
-            url = "http://sitl.diputados.gob.mx/LXII_leg/asistencias_por_pernplxii.php?iddipt=%s&pert=%i" % (id,index)
+            url = "http://sitl.diputados.gob.mx/%s/asistencias_por_pernplxii.php?iddipt=%s&pert=%i" % (ACTUAL_LEG,id,index)
             content = urlfetch.fetch(url,deadline=90).content
             soup = BeautifulSoup(content)
             dumped = soup.findAll("table")[0]
@@ -332,7 +335,7 @@ class ComisionesHandler(webapp2.RequestHandler):
     
     def get(self):
         comiciones = list()
-        url = "http://sitl.diputados.gob.mx/LXII_leg/listado_de_comisioneslxii.php?tct=1"
+        url = "http://sitl.diputados.gob.mx/%s/listado_de_comisioneslxii.php?tct=1"
         content = urlfetch.fetch(url,deadline=90).content
         soup = BeautifulSoup(content)
         tr = soup.findAll('table')[0].findAll("table")[1].findAll("tr")[5:]
@@ -350,7 +353,7 @@ class ComisionHandler(webapp2.RequestHandler):
     
     def get(self,id):
         diputados = dict()
-        url = "http://sitl.diputados.gob.mx/LXII_leg/integrantes_de_comisionlxii.php?comt=%s" % id
+        url = "http://sitl.diputados.gob.mx/%s/integrantes_de_comisionlxii.php?comt=%s" % (ACTUAL_LEG,id)
         content = urlfetch.fetch(url,deadline=90).content
         soup = BeautifulSoup(content)
         tr = soup.findAll('table')[0].findAll("table")[1].findAll("tr")[5:]
